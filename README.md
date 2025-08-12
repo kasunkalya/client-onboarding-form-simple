@@ -38,7 +38,7 @@ This project is built for the **Besty International technical assessment**.
    cd client-onboarding-form-simple
 
 2. **Install dependencies**
-   npm install
+    npm install
    
 3. **Set environment variable**
     Create .env.local in the project root:
