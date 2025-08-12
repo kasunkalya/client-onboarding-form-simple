@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Client Onboarding Form – Simple
 
-## Getting Started
+A small client onboarding form built with **Next.js (App Router)**, **React Hook Form**, and **Zod** for validation.  
+On submit, the validated form data is sent via `POST` to an external API endpoint.  
 
-First, run the development server:
+This project is built for the **Besty International technical assessment**.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Validation** using Zod + `zodResolver` from `@hookform/resolvers/zod`
+- **React Hook Form** for form state management
+- Inline error messages for each field
+- Success & error handling for API submission
+- Submit button disabled while submitting
+- Pre-fill services via query params (`?service=UI/UX,Web%20Dev`)
+- Accessible labels & keyboard navigation
+- Unit test for the Zod schema (Vitest)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+- **Next.js** (App Router)
+- **React Hook Form**
+- **Zod**
+- **Tailwind CSS** for styling
+- **Axios** for HTTP requests
+- **Vitest** + **Testing Library** for tests
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Setup & Run
 
-## Deploy on Vercel
+1. **Clone the repo**
+   git clone https://github.com/kasunkalya/client-onboarding-form-simple.git
+   cd client-onboarding-form-simple
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+2. **Install dependencies**
+   npm install
+   
+3. **Set environment variable**
+    Create .env.local in the project root:
+    NEXT_PUBLIC_ONBOARD_URL=https://example.com/api/onboard
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+4. **Run in development**
+    npm run dev
+
+5. **Build for production**
+    npm run build
+    npm start
+
+6. **Run tests**
+    npx vitest run
+
+7. **Project Structure**
+    src/
+    lib/
+        schema.ts         # Zod schema & types
+        schema.test.ts    # Vitest unit tests for schema
+    app/
+        page.tsx          # Main page rendering the form       

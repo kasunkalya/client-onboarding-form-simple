@@ -1,103 +1,250 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { onboardingSchema, OnboardingFormData } from '@/lib/schema';
+import axios from 'axios';
+import { useSearchParams } from 'next/navigation';
+
+export default function OnboardingForm() {
+  const searchParams = useSearchParams();
+  const prefillServices = searchParams.get('service')?.split(',') || [];
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm<OnboardingFormData>({
+    resolver: zodResolver(onboardingSchema),
+    defaultValues: {
+      services: prefillServices.filter(
+        (s): s is 'UI/UX' | 'Branding' | 'Web Dev' | 'Mobile App' =>
+          ['UI/UX', 'Branding', 'Web Dev', 'Mobile App'].includes(s)
+      ),
+    },
+  });
+
+  const [success, setSuccess] = useState<OnboardingFormData | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const onSubmit = async (data: OnboardingFormData) => {
+    try {
+      setErrorMessage(null);
+      const response = await axios.post(
+        process.env.NEXT_PUBLIC_ONBOARD_URL!,
+        data,
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+      if (response.status === 200 || response.status === 201) {
+        setSuccess(data);
+        reset();
+      }
+    } catch (error) {
+      setErrorMessage(
+        'An error occurred while submitting the form. Please try again.'
+      );
+    }
+  };
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="w-full flex justify-center p-4 sm:p-6">
+      <div className="w-full bg-white rounded-lg p-6 sm:p-8">
+        <h1 className="text-2xl font-bold mb-6 text-center">
+          Client Onboarding
+        </h1>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+        {errorMessage && (
+          <div className="bg-red-100 text-red-700 p-2 mb-4 rounded">
+            {errorMessage}
+          </div>
+        )}
+        {success && (
+          <div className="bg-green-100 text-green-700 p-2 mb-4 rounded">
+            Success! Submitted: {JSON.stringify(success)}
+          </div>
+        )}
+
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-5 sm:space-y-6"
+        >
+          {/* Full Name */}
+          <div>
+            <label
+              htmlFor="fullName"
+              className="block text-sm font-medium mb-1"
+            >
+              Full Name
+            </label>
+            <input
+              id="fullName"
+              type="text"
+              {...register('fullName')}
+              className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:border-blue-500 focus:ring focus:ring-blue-200"
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            {errors.fullName && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.fullName.message}
+              </p>
+            )}
+          </div>
+
+          {/* Email */}
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium mb-1"
+            >
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              {...register('email')}
+              className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:border-blue-500 focus:ring focus:ring-blue-200"
+            />
+            {errors.email && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.email.message}
+              </p>
+            )}
+          </div>
+
+          {/* Company Name */}
+          <div>
+            <label
+              htmlFor="companyName"
+              className="block text-sm font-medium mb-1"
+            >
+              Company Name
+            </label>
+            <input
+              id="companyName"
+              type="text"
+              {...register('companyName')}
+              className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:border-blue-500 focus:ring focus:ring-blue-200"
+            />
+            {errors.companyName && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.companyName.message}
+              </p>
+            )}
+          </div>
+
+          {/* Services */}
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Services Interested In
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {['UI/UX', 'Branding', 'Web Dev', 'Mobile App'].map((service) => (
+                <label
+                  key={service}
+                  className="flex items-center border border-gray-200 rounded-md p-2 hover:bg-gray-50"
+                >
+                  <Controller
+                    name="services"
+                    control={control}
+                    render={({ field }) => (
+                      <input
+                        type="checkbox"
+                        value={service}
+                        checked={field.value?.includes(service as any)}
+                        onChange={(e) => {
+                          const updated = e.target.checked
+                            ? [...(field.value || []), service]
+                            : (field.value || []).filter(
+                                (s: string) => s !== service
+                              );
+                          field.onChange(updated);
+                        }}
+                        className="mr-2"
+                      />
+                    )}
+                  />
+                  {service}
+                </label>
+              ))}
+            </div>
+            {errors.services && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.services.message}
+              </p>
+            )}
+          </div>
+
+          {/* Budget */}
+          <div>
+            <label
+              htmlFor="budgetUsd"
+              className="block text-sm font-medium mb-1"
+            >
+              Budget (USD)
+            </label>
+            <input
+              id="budgetUsd"
+              type="number"
+              {...register('budgetUsd', { valueAsNumber: true })}
+              className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:border-blue-500 focus:ring focus:ring-blue-200"
+            />
+            {errors.budgetUsd && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.budgetUsd.message}
+              </p>
+            )}
+          </div>
+
+          {/* Project Start Date */}
+          <div>
+            <label
+              htmlFor="projectStartDate"
+              className="block text-sm font-medium mb-1"
+            >
+              Project Start Date
+            </label>
+            <input
+              id="projectStartDate"
+              type="date"
+              {...register('projectStartDate', { valueAsDate: true })}
+              className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:border-blue-500 focus:ring focus:ring-blue-200"
+            />
+            {errors.projectStartDate && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.projectStartDate.message}
+              </p>
+            )}
+          </div>
+
+          {/* Accept Terms */}
+          <div className="flex items-center">
+            <input
+              id="acceptTerms"
+              type="checkbox"
+              {...register('acceptTerms')}
+              className="mr-2"
+            />
+            <label htmlFor="acceptTerms" className="text-sm">
+              Accept Terms
+            </label>
+            {errors.acceptTerms && (
+              <p className="text-red-500 text-xs ml-2">
+                {errors.acceptTerms.message}
+              </p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-md transition disabled:bg-gray-400"
           >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+            {isSubmitting ? 'Submitting...' : 'Submit'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
