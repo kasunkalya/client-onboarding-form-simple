@@ -35,30 +35,41 @@ This project is built for the **Besty International technical assessment**.
 1. **Clone the repo**
 
    git clone https://github.com/kasunkalya/client-onboarding-form-simple.git
-   
+
    cd client-onboarding-form-simple
 
 2. **Install dependencies**
+
     npm install
    
 3. **Set environment variable**
+
     Create .env.local in the project root:
+    
     NEXT_PUBLIC_ONBOARD_URL=https://example.com/api/onboard
 
 4. **Run in development**
+
     npm run dev
 
 5. **Build for production**
+
     npm run build
+    
     npm start
 
 6. **Run tests**
+
     npx vitest run
 
 7. **Project Structure**
+
     src/
     lib/
-        schema.ts         # Zod schema & types
-        schema.test.ts    # Vitest unit tests for schema
+    
+            schema.ts         # Zod schema & types
+            
+            schema.test.ts    # Vitest unit tests for schema
     app/
-        page.tsx          # Main page rendering the form       
+    
+            page.tsx          # Main page rendering the form       
