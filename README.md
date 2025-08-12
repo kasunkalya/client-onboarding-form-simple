@@ -33,6 +33,7 @@ This project is built for the **Besty International technical assessment**.
 ## Setup & Run
 
 1. **Clone the repo**
+
    git clone https://github.com/kasunkalya/client-onboarding-form-simple.git
    cd client-onboarding-form-simple
 
